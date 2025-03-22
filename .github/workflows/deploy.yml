@@ -5,7 +5,7 @@ on:
     branches: [main] # or your default branch name
 
 env:
-  DOCKER_IMAGE: your-dockerhub-username/quiz-app-api # Replace with your Docker Hub image name
+  DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
   EC2_HOST: ${{ secrets.EC2_HOST }} # Your EC2 instance public IP or domain
   EC2_USERNAME: ${{ secrets.EC2_USERNAME }} # Usually 'ec2-user' for Amazon Linux
   SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }} # Your EC2 instance SSH private key
