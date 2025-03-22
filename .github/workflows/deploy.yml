@@ -38,26 +38,39 @@ jobs:
 
           # SSH into EC2 and deploy
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }} '
+
+            # Create a shared network if it doesn't exist
+            docker network inspect my-network >/dev/null 2>&1 || docker network create my-network
+
             # Pull the latest image
             docker pull ${{ env.DOCKER_IMAGE }}:latest
             
-            # Find and stop any container using port 3000
-            PORT_CONTAINER=$(docker ps -q --filter "publish=3000")
-            if [ ! -z "$PORT_CONTAINER" ]; then
-              docker stop $PORT_CONTAINER
-              docker rm $PORT_CONTAINER
-            fi
-            
-            # Stop and remove existing container if it exists
+            # Stop and remove existing containers
             docker stop quiz-app || true
             docker rm quiz-app || true
-            
-            # Run the new container
+
+            docker stop postgresql || true
+            docker rm postgresql || true
+
+            # Start PostgreSQL container on the shared network
+            docker run -d \
+              --name postgresql \
+              --network my-network \
+              -e POSTGRES_USER=postgres \
+              -e POSTGRES_PASSWORD=post123 \
+              -e POSTGRES_DB=postgres \
+              -p 5432:5432 \
+              postgres:alpine
+
+            # Start the app container on the same network
             docker run -d \
               --name quiz-app \
-              --restart unless-stopped \
+              --network my-network \
               -p 3000:3000 \
               --env-file /home/ec2-user/.env \
-              --add-host=host.docker.internal:host-gateway \
+              --restart unless-stopped \
               ${{ env.DOCKER_IMAGE }}:latest
+
+            # Verify containers are running
+            docker ps
           '
