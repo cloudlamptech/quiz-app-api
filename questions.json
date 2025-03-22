@@ -1,0 +1,27 @@
+{
+  "questions": [
+    {
+      "topic_name": "Mathematics",
+      "subtopic_name": "Algebra",
+      "child_subtopic_name": "Linear Equations",
+      "question_text": "What is the value of x in 2x + 3 = 7?",
+      "difficulty": "easy",
+      "answers": ["x = 1", "x = 2", "x = 3", "x = 4"],
+      "correct_answer_text": "x = 2"
+    },
+    {
+      "topic_name": "Science",
+      "subtopic_name": "Physics",
+      "child_subtopic_name": "Newton's Laws",
+      "question_text": "What is Newton's First Law also known as?",
+      "difficulty": "medium",
+      "answers": [
+        "Law of Motion",
+        "Law of Inertia",
+        "Law of Acceleration",
+        "Law of Gravity"
+      ],
+      "correct_answer_text": "Law of Inertia"
+    }
+  ]
+}
