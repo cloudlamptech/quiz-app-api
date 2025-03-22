@@ -41,6 +41,13 @@ jobs:
             # Pull the latest image
             docker pull ${{ env.DOCKER_IMAGE }}:latest
             
+            # Find and stop any container using port 3000
+            PORT_CONTAINER=$(docker ps -q --filter "publish=3000")
+            if [ ! -z "$PORT_CONTAINER" ]; then
+              docker stop $PORT_CONTAINER
+              docker rm $PORT_CONTAINER
+            fi
+            
             # Stop and remove existing container if it exists
             docker stop quiz-app || true
             docker rm quiz-app || true
