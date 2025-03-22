@@ -58,5 +58,6 @@ jobs:
               --restart unless-stopped \
               -p 3000:3000 \
               --env-file /home/ec2-user/.env \
+              --add-host=host.docker.internal:host-gateway \
               ${{ env.DOCKER_IMAGE }}:latest
           '
