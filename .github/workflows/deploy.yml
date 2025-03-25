@@ -6,7 +6,6 @@ on:
   workflow_dispatch: # Add this to enable manual triggering
 
 env:
-  DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
   EC2_HOST: ${{ secrets.EC2_HOST }} # Your EC2 instance public IP or domain
   EC2_USERNAME: ${{ secrets.EC2_USERNAME }} # Usually 'ec2-user' for Amazon Linux
   SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }} # Your EC2 instance SSH private key
@@ -18,19 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ env.DOCKER_IMAGE }}:latest
-
       - name: Deploy to EC2
         run: |
           mkdir -p ~/.ssh
@@ -38,47 +24,10 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
 
           # SSH into EC2 and deploy
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }} "
-            # Pull the latest image
-            docker pull ${{ env.DOCKER_IMAGE }}:latest
-
-            # Remove old images
-            docker image prune -f
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }} '
+            # Stop and remove existing containers
+            docker-compose down || true
             
-            # Create network if it doesn't exist
-            if ! docker network ls | grep -q postgres-network; then
-              docker network create postgres-network
-            fi
-            
-            # Find and stop any container using port 3000
-            PORT_CONTAINER=\$(docker ps -q --filter 'publish=3000')
-            if [ ! -z \"\$PORT_CONTAINER\" ]; then
-              docker stop \$PORT_CONTAINER
-              docker rm \$PORT_CONTAINER
-            fi
-            
-            # Stop and remove existing container if it exists
-            docker stop quiz-app || true
-            docker rm quiz-app || true
-            
-            # Run the new container
-            docker run -d \
-              --name quiz-app \
-              --network postgres-network \
-              --restart unless-stopped \
-              -p 3000:3000 \
-              -e PORT=3000 \
-              -e NODE_ENV=production \
-              -e DB_HOST=postgres \
-              -e DB_PORT=5432 \
-              -e DB_NAME=quiz_db \
-              -e DB_USER=postgres \
-              -e DB_PASSWORD=postgres \
-              --add-host=host.docker.internal:host-gateway \
-              ${{ env.DOCKER_IMAGE }}:latest
-
-            # Verify container is running and check logs
-            sleep 5
-            docker ps | grep quiz-app
-            docker logs quiz-app
-          "
+            # Build and start the services
+            docker-compose up -d --build
+          '
