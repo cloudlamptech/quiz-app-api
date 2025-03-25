@@ -45,6 +45,11 @@ jobs:
             # Remove old images
             docker image prune -f
             
+            # Create network if it doesn't exist
+            if ! docker network ls | grep -q postgres-network; then
+              docker network create postgres-network
+            fi
+            
             # Find and stop any container using port 3000
             PORT_CONTAINER=$(docker ps -q --filter "publish=3000")
             if [ ! -z "$PORT_CONTAINER" ]; then
