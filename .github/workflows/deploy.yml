@@ -3,6 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches: [main] # or your default branch name
+  workflow_dispatch: # Add this to enable manual triggering
 
 env:
   DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
@@ -38,30 +39,31 @@ jobs:
 
           # SSH into EC2 and deploy
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }} '
-            # Pull the latest image
-            docker pull ${{ env.DOCKER_IMAGE }}:latest
+          
+          # Pull the latest image
+          docker pull ${{ env.DOCKER_IMAGE }}:latest
 
-            # Remove old images
-            docker image prune -f
-            
-            # Find and stop any container using port 3000
-            PORT_CONTAINER=$(docker ps -q --filter "publish=3000")
-            if [ ! -z "$PORT_CONTAINER" ]; then
-              docker stop $PORT_CONTAINER
-              docker rm $PORT_CONTAINER
-            fi
-            
-            # Stop and remove existing container if it exists
-            docker stop quiz-app || true
-            docker rm quiz-app || true
-            
-            # Run the new container
-            docker run -d \
-              --name quiz-app \
-              --network postgres-network \
-              --restart unless-stopped \
-              -p 3000:3000 \
-              --env-file /home/ec2-user/.env \
-              --add-host=host.docker.internal:host-gateway \
-              ${{ env.DOCKER_IMAGE }}:latest
-          '
+          # Remove old images
+          docker image prune -f
+          
+          # Find and stop any container using port 3000
+          PORT_CONTAINER=$(docker ps -q --filter "publish=3000")
+          if [ ! -z "$PORT_CONTAINER" ]; then
+            docker stop $PORT_CONTAINER
+            docker rm $PORT_CONTAINER
+          fi
+          
+          # Stop and remove existing container if it exists
+          docker stop quiz-app || true
+          docker rm quiz-app || true
+          
+          # Run the new container
+          docker run -d \
+            --name quiz-app \
+            --network postgres-network \
+            --restart unless-stopped \
+            -p 3000:3000 \
+            --env-file /home/ec2-user/.env \
+            --add-host=host.docker.internal:host-gateway \
+            ${{ env.DOCKER_IMAGE }}:latest
+        '
