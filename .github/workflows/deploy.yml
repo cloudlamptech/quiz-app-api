@@ -33,6 +33,12 @@ jobs:
               sudo systemctl enable docker
             fi
             
+            # Navigate to the application directory
+            cd /home/ec2-user/quiz-app-api
+            
+            # Verify docker-compose.yml exists
+            ls -la docker-compose.yml
+            
             # Display Docker Compose version
             docker-compose --version
             
