@@ -76,4 +76,9 @@ jobs:
               -e DB_PASSWORD=postgres \
               --add-host=host.docker.internal:host-gateway \
               ${{ env.DOCKER_IMAGE }}:latest
+
+            # Verify container is running and check logs
+            sleep 5
+            docker ps | grep quiz-app
+            docker logs quiz-app
           "
