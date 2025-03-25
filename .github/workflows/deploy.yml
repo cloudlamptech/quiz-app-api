@@ -48,8 +48,11 @@ jobs:
             # Display Docker Compose version
             docker-compose --version
             
-            # Stop and remove existing containers
-            docker-compose down || true
+            # Stop and remove existing containers and volumes
+            docker-compose down -v || true
+            
+            # Remove any lingering containers with the same name
+            docker rm -f quiz-app || true
             
             # Build and start the services
             docker-compose up -d --build
