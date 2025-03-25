@@ -50,21 +50,6 @@ jobs:
               docker network create postgres-network
             fi
             
-            # Create .env file if it doesn't exist
-            if [ ! -f /home/ec2-user/.env ]; then
-              echo "PORT=3000" > /home/ec2-user/.env
-              echo "NODE_ENV=production" >> /home/ec2-user/.env
-              echo "DB_HOST=postgres" >> /home/ec2-user/.env
-              echo "DB_PORT=5432" >> /home/ec2-user/.env
-              echo "DB_NAME=quiz_db" >> /home/ec2-user/.env
-              echo "DB_USER=postgres" >> /home/ec2-user/.env
-              echo "DB_PASSWORD=postgres" >> /home/ec2-user/.env
-            fi
-            
-            # Verify .env file exists and has correct permissions
-            ls -la /home/ec2-user/.env
-            cat /home/ec2-user/.env
-            
             # Find and stop any container using port 3000
             PORT_CONTAINER=$(docker ps -q --filter "publish=3000")
             if [ ! -z "$PORT_CONTAINER" ]; then
