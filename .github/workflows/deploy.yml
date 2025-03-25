@@ -48,14 +48,18 @@ jobs:
             # Display Docker Compose version
             docker-compose --version
             
-            # Stop any existing PostgreSQL process
-            sudo lsof -i :5432 | grep LISTEN | awk "{print \$2}" | xargs -r kill -9
-            
-            # Stop and remove existing containers and volumes
-            docker-compose down -v || true
+            # Stop containers but preserve volumes
+            docker-compose down || true
             
             # Remove any lingering containers with the same name
             docker rm -f quiz-app || true
+            
+            # Check if volume exists
+            if docker volume ls | grep -q "quiz_app_postgres_data"; then
+              echo "Existing volume found, preserving data"
+            else
+              echo "No existing volume found, will create new one"
+            fi
             
             # Build and start the services
             docker-compose up -d --build
