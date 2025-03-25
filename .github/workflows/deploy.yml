@@ -82,7 +82,13 @@ jobs:
               --network postgres-network \
               --restart unless-stopped \
               -p 3000:3000 \
-              --env-file /home/ec2-user/.env \
+              -e PORT=3000 \
+              -e NODE_ENV=production \
+              -e DB_HOST=postgres \
+              -e DB_PORT=5432 \
+              -e DB_NAME=quiz_db \
+              -e DB_USER=postgres \
+              -e DB_PASSWORD=postgres \
               --add-host=host.docker.internal:host-gateway \
               ${{ env.DOCKER_IMAGE }}:latest
           '
