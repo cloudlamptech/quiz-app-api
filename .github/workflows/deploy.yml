@@ -48,6 +48,9 @@ jobs:
             # Display Docker Compose version
             docker-compose --version
             
+            # Stop any existing PostgreSQL process
+            sudo lsof -i :5432 | grep LISTEN | awk "{print \$2}" | xargs -r kill -9
+            
             # Stop and remove existing containers and volumes
             docker-compose down -v || true
             
