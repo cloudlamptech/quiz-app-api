@@ -34,7 +34,16 @@ jobs:
             fi
             
             # Navigate to the application directory
-            cd /home/ec2-user/quiz-app-api
+            cd /home/ec2-user
+            
+            # Clone or pull the latest code
+            if [ -d "quiz-app-api" ]; then
+              cd quiz-app-api
+              git pull origin main
+            else
+              git clone https://github.com/cloudlamptech/quiz-app-api.git
+              cd quiz-app-api
+            fi
             
             # Verify docker-compose.yml exists
             ls -la docker-compose.yml
