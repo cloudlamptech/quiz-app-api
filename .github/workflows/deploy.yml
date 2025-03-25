@@ -26,8 +26,8 @@ jobs:
           # SSH into EC2 and deploy
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }} '
             # Stop and remove existing containers
-            docker-compose down || true
+            docker compose down || true
             
             # Build and start the services
-            docker-compose up -d --build
+            docker compose up -d --build
           '
