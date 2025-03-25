@@ -25,9 +25,20 @@ jobs:
 
           # SSH into EC2 and deploy
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }} '
+            # Install Docker and Docker Compose if missing
+            if ! [ -x "$(command -v docker)" ]; then
+              sudo yum update -y
+              sudo yum install -y docker
+              sudo systemctl start docker
+              sudo systemctl enable docker
+            fi
+            
+            # Display Docker Compose version
+            docker-compose --version
+            
             # Stop and remove existing containers
-            docker compose down || true
+            docker-compose down || true
             
             # Build and start the services
-            docker compose up -d --build
+            docker-compose up -d --build
           '
