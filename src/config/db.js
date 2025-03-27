@@ -2,7 +2,7 @@ const { Pool } = require("pg");
 
 // Set up PostgreSQL connection pool
 const pool = new Pool({
-  host: process.env.PGHOST || "localhost",
+  host: process.env.PGHOST || "postgres",
   port: process.env.PGPORT || 5432,
   database: process.env.PGDATABASE || "postgres",
   user: process.env.PGUSER || "postgres",

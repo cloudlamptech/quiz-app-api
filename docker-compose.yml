@@ -7,34 +7,32 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "5000:5000" # Changed to match our API port
     depends_on:
       - postgres
     environment:
-      - PGHOST=postgres
+      - PGHOST=postgres # Container name as hostname
       - PGPORT=5432
       - PGDATABASE=postgres
       - PGUSER=postgres
       - PGPASSWORD=postgres
-      - NODE_ENV=development
-      - PORT=8000
-    volumes:
-      - .:/app
-      - /app/node_modules
-    restart: unless-stopped
+      - NODE_ENV=production
+      - PORT=5000 # Changed to match our API port
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres # Added explicit connection string
+    restart: always # Changed to always for production
 
   # PostgreSQL Database Service
   postgres:
     image: postgres:14-alpine
-    ports:
-      - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=postgres # Consider using a secret in production
       - POSTGRES_DB=postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
+    restart: always # Changed to always for production
+    # Removed external port exposure for security
 
+# Named volume for database persistence
 volumes:
   postgres_data:

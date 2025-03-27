@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 
 # Expose the app port
-EXPOSE 8000
+EXPOSE 5000
 
 # Run the application
 CMD ["node", "server.js"]
