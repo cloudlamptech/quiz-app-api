@@ -3,15 +3,21 @@ const pool = require("../config/db");
 // Get all questions
 const getAllQuestions = async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT q.*, t.topic_name, s.subtopic_name, cs.child_subtopic_name, a.answer_text as correct_answer
-      FROM questions q
-      JOIN topics t ON q.topic_id = t.topic_id
-      JOIN subtopics s ON q.subtopic_id = s.subtopic_id
-      JOIN child_subtopics cs ON q.child_subtopic_id = cs.child_subtopic_id
-      JOIN answers a ON q.correct_answer_id = a.answer_id
-      ORDER BY q.created_at DESC;
+    // const result = await pool.query(`
+    //   SELECT q.*, t.topic_name, s.subtopic_name, cs.child_subtopic_name, a.answer_text as correct_answer
+    //   FROM questions q
+    //   JOIN topics t ON q.topic_id = t.topic_id
+    //   JOIN subtopics s ON q.subtopic_id = s.subtopic_id
+    //   JOIN child_subtopics cs ON q.child_subtopic_id = cs.child_subtopic_id
+    //   JOIN answers a ON q.correct_answer_id = a.answer_id
+    //   ORDER BY q.created_at DESC;
+    // `);
+    const client = await pool.connect();
+    const result = await client.query(`
+      SELECT *
+      FROM users;
     `);
+    console.log(result.rows);
     res.json(result.rows);
   } catch (error) {
     console.error("Error fetching questions:", error);

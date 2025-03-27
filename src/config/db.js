@@ -1,26 +1,40 @@
 const { Pool } = require("pg");
 
+// Set up PostgreSQL connection pool
 const pool = new Pool({
-  user: process.env.DB_USER || "postgres",
-  host: process.env.DB_HOST || "postgres",
-  database: process.env.DB_NAME || "postgres",
-  password: process.env.DB_PASSWORD || "postgres",
-  port: process.env.DB_PORT || 5433,
+  host: process.env.PGHOST || "localhost",
+  port: process.env.PGPORT || 5432,
+  database: process.env.PGDATABASE || "postgres",
+  user: process.env.PGUSER || "postgres",
+  password: process.env.PGPASSWORD || "postgres",
 });
 
 // Test database connection
-pool.query("SELECT NOW()", (err, res) => {
-  if (err) {
-    console.error(
-      "************************************* Database connection error:",
-      err
-    );
-  } else {
-    console.log(
-      "################################# Connected to PostgreSQL:",
-      res.rows
-    );
-  }
+pool.on("connect", () => {
+  console.log("Connected to PostgreSQL database");
 });
+
+pool.on("error", (err) => {
+  console.error("PostgreSQL connection error:", err);
+});
+
+// const noOfRetries = 5;
+// const retryDelay = 5000;
+
+// const connectDBWithRetry = async () => {
+//   for (let i = 0; i < noOfRetries; i++) {
+//     try {
+//       await pool.connect();
+//       console.log("Connected to PostgreSQL");
+//       return;
+//     } catch (error) {
+//       console.error(`Attempt ${i + 1} failed:`, error);
+//       await new Promise((resolve) => setTimeout(resolve, retryDelay));
+//     }
+//   }
+//   throw new Error("Failed to connect to PostgreSQL");
+// };
+
+// connectDBWithRetry();
 
 module.exports = pool;

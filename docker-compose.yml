@@ -1,44 +1,40 @@
 version: "3.8"
 
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+  # Node.js API Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - quiz-network
-
-  nodejs-app:
-    build: .
-    container_name: quiz-app
-    restart: always
+      - "8000:8000"
     depends_on:
       - postgres
     environment:
-      - PORT=3000
-      - NODE_ENV=production
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_NAME=postgres
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - PGHOST=postgres
+      - PGPORT=5432
+      - PGDATABASE=postgres
+      - PGUSER=postgres
+      - PGPASSWORD=postgres
+      - NODE_ENV=development
+      - PORT=8000
+    volumes:
+      - .:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  # PostgreSQL Database Service
+  postgres:
+    image: postgres:14-alpine
     ports:
-      - "3000:3000"
-    networks:
-      - quiz-network
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
 volumes:
   postgres_data:
-    name: postgresql-data-quiz
-
-networks:
-  quiz-network:
-    driver: bridge

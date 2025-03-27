@@ -65,7 +65,7 @@ CREATE TABLE questions (
     child_subtopic_id UUID NOT NULL,
     question_text TEXT NOT NULL,
     difficulty TEXT CHECK (difficulty IN ('easy', 'medium', 'hard')),
-    correct_answer_id UUID NOT NULL,
+    correct_answer_id UUID NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     search_vector TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', question_text)) STORED,
     CONSTRAINT fk_questions_topic FOREIGN KEY (topic_id) 
