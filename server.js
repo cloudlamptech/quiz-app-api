@@ -22,6 +22,14 @@ app.get("/", (req, res) => {
 // Question routes
 app.use("/questions", questionRoutes);
 
+// Topic routes
+const topicRoutes = require("./src/routes/topicRoutes");
+app.use("/topics", topicRoutes);
+
+// Subtopic routes
+const subtopicRoutes = require("./src/routes/subtopicRoutes");
+app.use("/subtopics", subtopicRoutes);
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

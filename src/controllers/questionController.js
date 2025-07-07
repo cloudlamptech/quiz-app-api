@@ -12,8 +12,8 @@ const getAllQuestions = async (req, res) => {
     //   JOIN answers a ON q.correct_answer_id = a.answer_id
     //   ORDER BY q.created_at DESC;
     // `);
-    const client = await pool.connect();
-    const result = await client.query(`
+    // const client = await pool.connect();
+    const result = await pool.query(`
       SELECT *
       FROM users;
     `);
