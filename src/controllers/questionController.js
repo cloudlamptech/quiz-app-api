@@ -257,7 +257,7 @@ const updateQuestion = async (req, res) => {
 
     // Check if question exists
     const questionExists = await client.query(
-      "SELECT question_id FROM questions WHERE question_id = $1 and upd_operation <> 2",
+      "SELECT question_id FROM questions WHERE question_id = $1",
       [id]
     );
     if (questionExists.rows.length === 0) {
@@ -507,7 +507,7 @@ const getQuestionsByTopicSubtopicIds = async (req, res) => {
        LEFT JOIN child_subtopics cs ON q.child_subtopic_id = cs.child_subtopic_id
        LEFT JOIN question_answers qa ON q.question_id = qa.question_id
        LEFT JOIN answers a ON qa.answer_id = a.answer_id
-       WHERE q.topic_id = $1 AND q.subtopic_id = $2
+       WHERE q.topic_id = $1 AND q.subtopic_id = $2 AND q.upd_operation <> 2
        GROUP BY q.question_id, t.topic_name, s.subtopic_name, cs.child_subtopic_name
        ORDER BY q.created_at DESC`,
       [topicId, subtopicId]
