@@ -25,6 +25,7 @@ const getAllQuestions = async (req, res) => {
       LEFT JOIN answers a ON qa.answer_id = a.answer_id
       GROUP BY q.question_id, t.topic_name, s.subtopic_name, cs.child_subtopic_name
       ORDER BY q.created_at DESC
+      WHERE q.upd_operation <> 2
     `);
     res.json(result.rows);
   } catch (error) {
@@ -58,7 +59,8 @@ const getQuestionById = async (req, res) => {
       LEFT JOIN question_answers qa ON q.question_id = qa.question_id
       LEFT JOIN answers a ON qa.answer_id = a.answer_id
       WHERE q.question_id = $1
-      GROUP BY q.question_id, t.topic_name, s.subtopic_name, cs.child_subtopic_name`,
+      GROUP BY q.question_id, t.topic_name, s.subtopic_name, cs.child_subtopic_name
+      WHERE q.upd_operation <> 2`,
       [id]
     );
 
@@ -180,7 +182,8 @@ const createQuestion = async (req, res) => {
       LEFT JOIN question_answers qa ON q.question_id = qa.question_id
       LEFT JOIN answers a ON qa.answer_id = a.answer_id
       WHERE q.question_id = $1
-      GROUP BY q.question_id`,
+      GROUP BY q.question_id
+      WHERE q.upd_operation <> 2`,
       [questionId]
     );
 
@@ -254,7 +257,7 @@ const updateQuestion = async (req, res) => {
 
     // Check if question exists
     const questionExists = await client.query(
-      "SELECT question_id FROM questions WHERE question_id = $1",
+      "SELECT question_id FROM questions WHERE question_id = $1 and upd_operation <> 2",
       [id]
     );
     if (questionExists.rows.length === 0) {
@@ -325,8 +328,9 @@ const updateQuestion = async (req, res) => {
       FROM questions q
       LEFT JOIN question_answers qa ON q.question_id = qa.question_id
       LEFT JOIN answers a ON qa.answer_id = a.answer_id
-      WHERE q.question_id = $1
-      GROUP BY q.question_id`,
+      WHERE q.question_id = $1 and q.upd_operation <> 2
+      GROUP BY q.question_id
+      WHERE q.upd_operation <> 2`,
       [id]
     );
 
@@ -419,7 +423,8 @@ const getQuestionsBySubtopicId = async (req, res) => {
        LEFT JOIN answers a ON qa.answer_id = a.answer_id
        WHERE q.subtopic_id = $1
        GROUP BY q.question_id, t.topic_name, s.subtopic_name, cs.child_subtopic_name
-       ORDER BY q.created_at DESC`,
+       ORDER BY q.created_at DESC
+       WHERE q.upd_operation <> 2`,
       [subtopicId]
     );
 
@@ -461,7 +466,8 @@ const getQuestionsByTopicId = async (req, res) => {
        LEFT JOIN answers a ON qa.answer_id = a.answer_id
        WHERE q.topic_id = $1
        GROUP BY q.question_id, t.topic_name, s.subtopic_name, cs.child_subtopic_name
-       ORDER BY q.created_at DESC`,
+       ORDER BY q.created_at DESC
+       WHERE q.upd_operation <> 2`,
       [topicId]
     );
 
@@ -528,7 +534,7 @@ const getAnswersByQuestionId = async (req, res) => {
 
     // Check if question exists
     const questionExists = await pool.query(
-      "SELECT question_id FROM questions WHERE question_id = $1",
+      "SELECT question_id FROM questions WHERE question_id = $1 and upd_operation <> 2",
       [questionId]
     );
     if (questionExists.rows.length === 0) {
