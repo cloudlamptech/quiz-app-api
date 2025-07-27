@@ -95,7 +95,7 @@ const createQuestion = async (req, res) => {
 
     // Validate topic exists
     const topicExists = await client.query(
-      "SELECT id FROM topics WHERE id = $1",
+      "SELECT topic_id FROM topics WHERE topic_id = $1",
       [topic_id]
     );
     if (topicExists.rows.length === 0) {
@@ -104,7 +104,7 @@ const createQuestion = async (req, res) => {
 
     // Validate subtopic exists and belongs to the topic
     const subtopicExists = await client.query(
-      "SELECT id FROM subtopics WHERE id = $1 AND topic_id = $2",
+      "SELECT subtopic_id FROM subtopics WHERE subtopic_id = $1 AND topic_id = $2",
       [subtopic_id, topic_id]
     );
     if (subtopicExists.rows.length === 0) {
@@ -116,7 +116,7 @@ const createQuestion = async (req, res) => {
     // Validate child_subtopic exists and belongs to the subtopic (if provided)
     if (child_subtopic_id) {
       const childSubtopicExists = await client.query(
-        "SELECT id FROM child_subtopics WHERE id = $1 AND subtopic_id = $2",
+        "SELECT child_subtopic_id FROM child_subtopics WHERE child_subtopic_id = $1 AND subtopic_id = $2",
         [child_subtopic_id, subtopic_id]
       );
       if (childSubtopicExists.rows.length === 0) {
