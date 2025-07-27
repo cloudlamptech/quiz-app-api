@@ -137,6 +137,7 @@ const createQuestion = async (req, res) => {
     );
 
     const questionId = questionResult.rows[0].question_id;
+    console.log("******* questionId", questionId);
 
     // Step 2: Insert answers
     const answerIds = [];
@@ -147,6 +148,8 @@ const createQuestion = async (req, res) => {
       );
       answerIds.push(answerResult.rows[0].answer_id);
     }
+
+    console.log("******* answerIds", answerIds);
 
     // Step 3: Create question-answer relationships in junction table
     for (let i = 0; i < answerIds.length; i++) {
@@ -160,6 +163,7 @@ const createQuestion = async (req, res) => {
 
     await client.query("COMMIT");
 
+    console.log("******* questionId", questionId);
     // Get the complete question with answers
     const completeQuestionResult = await client.query(
       `SELECT 
@@ -186,7 +190,7 @@ const createQuestion = async (req, res) => {
     });
   } catch (error) {
     await client.query("ROLLBACK");
-    console.error("Error creating question:", error);
+    console.error("Error creating question:", JSON.stringify(error));
     res.status(500).json({ error: "Error creating question" });
   } finally {
     client.release();

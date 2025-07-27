@@ -1,0 +1,12 @@
+# Database Configuration
+# These values will be overridden by environment variables in Replit
+
+# Application Settings
+PORT=5000
+NODE_ENV=development
+
+# PostgreSQL Configuration
+PGHOST=3.108.219.134
+PGPORT=5432
+PGDATABASE=postgres
+PGUSER=postgres
