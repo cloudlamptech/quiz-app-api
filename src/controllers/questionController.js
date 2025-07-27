@@ -206,10 +206,99 @@ const deleteQuestion = async (req, res) => {
   }
 };
 
+// Get questions by subtopic ID
+const getQuestionsBySubtopicId = async (req, res) => {
+  try {
+    const { subtopicId } = req.params;
+    const result = await pool.query(
+      `SELECT q.*, t.topic_name, s.subtopic_name, cs.child_subtopic_name, a.answer_text as correct_answer
+       FROM questions q
+       JOIN topics t ON q.topic_id = t.topic_id
+       JOIN subtopics s ON q.subtopic_id = s.subtopic_id
+       JOIN child_subtopics cs ON q.child_subtopic_id = cs.child_subtopic_id
+       JOIN answers a ON q.correct_answer_id = a.answer_id
+       WHERE q.subtopic_id = $1
+       ORDER BY q.created_at DESC`,
+      [subtopicId]
+    );
+
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No questions found for this subtopic" });
+    }
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching questions by subtopic:", error);
+    res.status(500).json({ error: "Error fetching questions by subtopic" });
+  }
+};
+
+// Get questions by topic ID
+const getQuestionsByTopicId = async (req, res) => {
+  try {
+    const { topicId } = req.params;
+    const result = await pool.query(
+      `SELECT q.*, t.topic_name, s.subtopic_name, cs.child_subtopic_name, a.answer_text as correct_answer
+       FROM questions q
+       JOIN topics t ON q.topic_id = t.topic_id
+       JOIN subtopics s ON q.subtopic_id = s.subtopic_id
+       JOIN child_subtopics cs ON q.child_subtopic_id = cs.child_subtopic_id
+       JOIN answers a ON q.correct_answer_id = a.answer_id
+       WHERE q.topic_id = $1
+       ORDER BY q.created_at DESC`,
+      [topicId]
+    );
+
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No questions found for this topic" });
+    }
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching questions by topic:", error);
+    res.status(500).json({ error: "Error fetching questions by topic" });
+  }
+};
+
+// Get questions by topic ID and subtopic ID
+const getQuestionsByTopicSubtopicIds = async (req, res) => {
+  try {
+    const { topicId, subtopicId } = req.params;
+    const result = await pool.query(
+      `SELECT q.*, t.topic_name, s.subtopic_name, cs.child_subtopic_name, a.answer_text as correct_answer
+       FROM questions q
+       JOIN topics t ON q.topic_id = t.topic_id
+       JOIN subtopics s ON q.subtopic_id = s.subtopic_id
+       JOIN child_subtopics cs ON q.child_subtopic_id = cs.child_subtopic_id
+       JOIN answers a ON q.correct_answer_id = a.answer_id
+       WHERE q.topic_id = $1 AND q.subtopic_id = $2
+       ORDER BY q.created_at DESC`,
+      [topicId, subtopicId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "No questions found for this topic and subtopic combination",
+      });
+    }
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching questions by topic and subtopic:", error);
+    res
+      .status(500)
+      .json({ error: "Error fetching questions by topic and subtopic" });
+  }
+};
+
 module.exports = {
   getAllQuestions,
   getQuestionById,
   createQuestion,
   updateQuestion,
   deleteQuestion,
+  getQuestionsBySubtopicId,
+  getQuestionsByTopicId,
+  getQuestionsByTopicSubtopicIds,
 };
