@@ -9,6 +9,7 @@ const {
   getQuestionsBySubtopicId,
   getQuestionsByTopicId,
   getQuestionsByTopicSubtopicIds,
+  getAnswersByQuestionId,
 } = require("../controllers/questionController");
 
 // Question routes
@@ -19,6 +20,7 @@ router.get(
   "/topic/:topicId/subtopic/:subtopicId",
   getQuestionsByTopicSubtopicIds
 );
+router.get("/:id/answers", getAnswersByQuestionId);
 router.get("/:id", getQuestionById);
 router.post("/", createQuestion);
 router.put("/:id", updateQuestion);

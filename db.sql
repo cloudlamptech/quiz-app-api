@@ -62,7 +62,7 @@ CREATE TABLE questions (
     question_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     topic_id UUID NOT NULL,
     subtopic_id UUID NOT NULL,
-    child_subtopic_id UUID NOT NULL,
+    child_subtopic_id UUID NULL,
     question_text TEXT NOT NULL,
     difficulty TEXT CHECK (difficulty IN ('easy', 'medium', 'hard')),
     correct_answer_id UUID NULL,
