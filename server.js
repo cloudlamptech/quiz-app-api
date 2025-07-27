@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const questionRoutes = require("./src/routes/questionRoutes");
 
 const app = express();
@@ -11,8 +12,48 @@ console.log(process.env.PGPASSWORD);
 console.log(process.env.PORT);
 const PORT = process.env.PORT || 3000;
 
+// CORS Configuration
+const isDevelopment = process.env.NODE_ENV !== "production";
+
+const corsOptions = isDevelopment
+  ? {
+      // Development: Allow all origins
+      origin: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "X-Requested-With",
+        "Accept",
+        "Origin",
+      ],
+      credentials: true,
+      optionsSuccessStatus: 200,
+    }
+  : {
+      // Production: Restrict to specific origins
+      origin: [
+        "https://yourdomain.com", // Add your production domain
+        "https://www.yourdomain.com",
+      ],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "X-Requested-With",
+        "Accept",
+        "Origin",
+      ],
+      credentials: true,
+      optionsSuccessStatus: 200,
+    };
+
 // Middleware
+app.use(cors(corsOptions));
 app.use(express.json());
+
+// Handle preflight requests
+app.options("*", cors(corsOptions));
 
 // Routes
 app.get("/", (req, res) => {
